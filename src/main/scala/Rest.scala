@@ -29,6 +29,7 @@ object Rest {
     implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
     val routes: Route =
+      new RootHttpRoute().routes ~
       new HtmlHttpRoute().routes ~
       SwaggerDocService.routes
 
