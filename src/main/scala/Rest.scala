@@ -6,9 +6,8 @@ import com.github.swagger.akka.SwaggerHttpService
 import com.github.swagger.akka.model.Info
 import io.swagger.models.ExternalDocs
 import akka.http.scaladsl.server.RouteConcatenation._
-import model.html.Html
-import model.response.Response
 import route._
+import service.HtmlService
 
 import scala.concurrent.ExecutionContextExecutor
 
@@ -28,9 +27,11 @@ object Rest {
     implicit val materializer: ActorMaterializer = ActorMaterializer()
     implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
+    val htmlService = new HtmlService()
+
     val routes: Route =
       new RootHttpRoute().routes ~
-      new HtmlHttpRoute().routes ~
+      new HtmlHttpRoute(htmlService).routes ~
       SwaggerDocService.routes
 
     Http().bindAndHandle(routes, "0.0.0.0", 12345)

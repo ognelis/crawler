@@ -1,25 +1,24 @@
 package route
 
 import java.net.URL
+
 import javax.ws.rs.Path
-
-import scala.annotation.meta.field
-
 import akka.stream.ActorMaterializer
 import DefaultRouteExtension._
 import akka.http.scaladsl.server.Route
-import model.html.Html
+import model.html.HtmlTagValues
 
-import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import format.json.htmlformat._
 import format.json.responseformat._
 import model.response.Response
-
 import io.swagger.annotations._
+import model.error.ErrorMessage
+import service.HtmlServiceInterface
 
-@Api(value = "/html")
+@Api(value = "/html", produces = "application/json")
 @Path("/v1/html")
-class HtmlHttpRoute()(
+class HtmlHttpRoute(htmlService: HtmlServiceInterface)(
   implicit
   executionContext: ExecutionContextExecutor,
   materializer: ActorMaterializer) {
@@ -31,16 +30,47 @@ class HtmlHttpRoute()(
   }
 
 
-  @Path("/extract/tag")
-  @ApiOperation(value = "extractTag", httpMethod = "POST", response = classOf[Response[Html]])
+  @Path("/extract/tag/{tag}")
+  @ApiOperation(value = "extractTag", httpMethod = "POST", response = classOf[Response[HtmlTagValues]])
+  @ApiImplicitParams(
+    Array(
+      new ApiImplicitParam(
+        name = "tag",
+        value = "the html tag on which one would like to search its values",
+        required = true,
+        dataType = "string",
+        paramType = "path"),
+      new ApiImplicitParam(
+        name = "URLs",
+        value = "resources where tag and it's values are extracted",
+        required = true,
+        dataTypeClass = classOf[java.util.List[URL]],
+        paramType = "body")
+    )
+  )
   @ApiResponses(Array(
     new ApiResponse(code = 400, message = "Bad Request")
   ))
   def extractTagRoute: Route =
-    path("html" / "extract" / "tag") {
+    path("html" / "extract" / "tag" / Segment) { tag =>
       post {
-        complete {
-          Response(Html(new URL("https://www.google.com/"), None), List.empty)
+        entity(as[List[URL]]) { urls =>
+          complete {
+            val htmlsTagValues = urls
+              .map(url => Future(Left(htmlService.parse(url, tag))).recoverWith { case throwable: Throwable =>
+                Future.successful(Right(ErrorMessage(s"URL: ${url.toString}", throwable.getLocalizedMessage)))
+              })
+
+            Future.sequence(htmlsTagValues)
+              .map {
+                _.foldLeft(List.empty[HtmlTagValues] -> List.empty[ErrorMessage]) {
+                  case ((result, errors), elem) => elem match {
+                    case Left(x) => (x :: result) -> errors
+                    case Right(x) => result -> (x :: errors)
+                  }
+                }
+              }.map { case (l, r) => Response(l, r) }
+          }
         }
       }
     }

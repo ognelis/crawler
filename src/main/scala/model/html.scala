@@ -7,10 +7,10 @@ import scala.annotation.meta.field
 object html {
   final type Tag = String
 
-  case class Html(@(ApiModelProperty @field)(value = "URL", dataType = "URL", required = true)
-                  url: URL,
-                  @(ApiModelProperty @field)(value = "Tag values", dataType = "Optional TagValues", required = false)
-                  tagValues: Option[TagValues])
+  case class HtmlTagValues(@(ApiModelProperty @field)(value = "URL", dataType = "URL", required = true)
+                           url: URL,
+                           @(ApiModelProperty @field)(value = "Tag values", dataType = "Optional TagValues", required = true)
+                           tagValues: TagValues)
 
   case class TagValues(@(ApiModelProperty @field)(value = "Tag", dataType = "String", required = true)
                        tag: Tag,

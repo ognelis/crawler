@@ -9,6 +9,7 @@ resolvers += Resolver.sonatypeRepo("releases")
 val akkaHttpVersion = "10.1.1"
 
 libraryDependencies ++= Seq(
+  "net.ruippeixotog" %% "scala-scraper" % "2.1.0",
   "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
   "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
   "commons-validator" % "commons-validator" % "1.6",
