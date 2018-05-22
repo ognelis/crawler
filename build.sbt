@@ -11,6 +11,7 @@ val akkaHttpVersion = "10.1.1"
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
   "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
+  "commons-validator" % "commons-validator" % "1.6",
   "io.swagger" % "swagger-jaxrs" % "1.5.19",
   "com.github.swagger-akka-http" %% "swagger-akka-http" % "0.14.0",
   "org.scalactic" %% "scalactic" % "3.0.5",
