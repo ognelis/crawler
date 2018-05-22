@@ -9,8 +9,8 @@ import org.apache.commons.validator.routines.UrlValidator
 
 
 object htmlformat {
-  implicit val urlFormat: RootJsonFormat[URL] = new RootJsonFormat[java.net.URL] {
-    override def write(obj: URL): JsValue = obj.toString.toJson
+  implicit val urlFormat: JsonFormat[URL] = new JsonFormat[java.net.URL] {
+    override def write(obj: URL): JsValue = JsString(obj.toString)
     override def read(json: JsValue): URL = json match {
       case JsString(url) =>
         if (UrlValidator.getInstance().isValid(url)) new URL(url)

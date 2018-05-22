@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   "com.github.swagger-akka-http" %% "swagger-akka-http" % "0.14.0",
   "org.scalactic" %% "scalactic" % "3.0.5",
   "org.scalatest" %% "scalatest" % "3.0.5" % Test,
-  "org.scalamock" %% "scalamock" % "3.6.0" % Test,
+  "org.scalamock" %% "scalamock" % "4.1.0" % Test,
   "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion,
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
   "com.github.pureconfig" %% "pureconfig" % "0.9.1"

@@ -1,6 +1,5 @@
 package route
 
-import java.net.URL
 
 import javax.ws.rs.Path
 import akka.stream.ActorMaterializer
@@ -9,10 +8,12 @@ import akka.http.scaladsl.server.Route
 import model.html.HtmlTagValues
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
+import format.json.urlcollectionformat._
 import format.json.htmlformat._
 import format.json.responseformat._
 import model.response.Response
 import io.swagger.annotations._
+import model.UrlCollection
 import model.error.ErrorMessage
 import service.HtmlServiceInterface
 
@@ -31,7 +32,7 @@ class HtmlHttpRoute(htmlService: HtmlServiceInterface)(
 
 
   @Path("/extract/tag/{tag}")
-  @ApiOperation(value = "extractTag", httpMethod = "POST", response = classOf[Response[HtmlTagValues]])
+  @ApiOperation(value = "extractTag", httpMethod = "POST", response = classOf[Response[List[HtmlTagValues]]])
   @ApiImplicitParams(
     Array(
       new ApiImplicitParam(
@@ -44,19 +45,17 @@ class HtmlHttpRoute(htmlService: HtmlServiceInterface)(
         name = "URLs",
         value = "resources where tag and it's values are extracted",
         required = true,
-        dataTypeClass = classOf[java.util.List[URL]],
+        dataTypeClass = classOf[UrlCollection],
         paramType = "body")
     )
   )
-  @ApiResponses(Array(
-    new ApiResponse(code = 400, message = "Bad Request")
-  ))
   def extractTagRoute: Route =
     path("html" / "extract" / "tag" / Segment) { tag =>
       post {
-        entity(as[List[URL]]) { urls =>
+        entity(as[UrlCollection]) { urlCollection =>
           complete {
-            val htmlsTagValues = urls
+            val htmlsTagValues = urlCollection.urls
+              .distinct
               .map(url => Future(Left(htmlService.parse(url, tag))).recoverWith { case throwable: Throwable =>
                 Future.successful(Right(ErrorMessage(s"URL: ${url.toString}", throwable.getLocalizedMessage)))
               })
