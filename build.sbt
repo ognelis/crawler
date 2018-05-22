@@ -19,5 +19,6 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.5" % Test,
   "org.scalamock" %% "scalamock" % "3.6.0" % Test,
   "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion,
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
+  "com.github.pureconfig" %% "pureconfig" % "0.9.1"
 )
